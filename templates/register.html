@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Reģistrācija</h2>
+
+<form method="POST">
+    <input class="form-control" type="text" name="epasts" placeholder="E-pasts"><br>
+    <input class="form-control" type="text" name="vards" placeholder="Vārds"><br>
+    <input class="form-control" type="text" name="uzvards" placeholder="Uzvārds"><br>
+    <input class="form-control" type="text" name="klase" placeholder="Klase (piem. 12.a)"><br>
+    <input class="form-control" type="password" name="parole" placeholder="Parole"><br>
+
+    <button class="btn btn-success">Reģistrēties</button>
+</form>
+
+{% endblock %}

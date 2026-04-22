@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Pieejamie pulciņi</h2>
+
+<p>"saraksts ar pulciniem"</p>
+
+<div class="card p-3 mb-2">
+    <h4>pulciņa nosaukums</h4>
+    <p>apraksts</p>
+
+    <form method="POST" action="/pievienoties">
+        <button class="btn btn-primary">Pieteikties pulciņam</button>
+    </form>
+</div>
+
+{% endblock %}
