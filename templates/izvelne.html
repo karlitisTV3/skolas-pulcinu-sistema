@@ -3,15 +3,18 @@
 
 <h2>Pieejamie pulciņi</h2>
 
-<p>"saraksts ar pulciniem"</p>
+{% for i in pulcini %}
 
 <div class="card p-3 mb-2">
-    <h4>pulciņa nosaukums</h4>
-    <p>apraksts</p>
+    <h4>{{ i.nosaukums }}</h4>
+    <p>{{ i.apraksts }}</p>
+    <p>Brīvas vietas - {{ i.vietas }}</p>
 
     <form method="POST" action="/pievienoties">
+        <input type="hidden" name="pulcins_id" value="{{ i.id }}">
         <button class="btn btn-primary">Pieteikties pulciņam</button>
     </form>
 </div>
 
+{% endfor %}
 {% endblock %}
