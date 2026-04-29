@@ -10,10 +10,15 @@
     <p>{{ i.apraksts }}</p>
     <p>Brīvas vietas - {{ i.vietas }}</p>
 
+{% if i.id in mani %}
+        <button class="btn btn-success">Tu jau esi pieteicies!</button>
+{% else %}
     <form method="POST" action="/pievienoties">
         <input type="hidden" name="pulcins_id" value="{{ i.id }}">
         <button class="btn btn-primary">Pieteikties pulciņam</button>
     </form>
+{% endif %}
+
 </div>
 
 {% endfor %}

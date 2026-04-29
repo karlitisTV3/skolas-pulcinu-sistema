@@ -72,19 +72,50 @@ def register():
 @app.route("/izvelne")
 def izvelne():
 
+    user_id = session.get('id')
     conn = sqlite3.connect("datubaze.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM pulcini")
     pulcini = cur.fetchall()
+
+    cur.execute("SELECT pulcins_id FROM pieteikumi WHERE user_id = ?", (user_id,))
+    mani = [m["pulcins_id"] for m in cur.fetchall()]
     conn.close()
 
-    return render_template("izvelne.html" , pulcini=pulcini)
+    return render_template("izvelne.html" , pulcini=pulcini , mani=mani)
 
+
+@app.route('/pievienoties', methods=['POST'])
+def pievienoties():
+
+    user_id = session.get('id')
+    pulcins_id = request.form.get('pulcins_id')
+    conn = sqlite3.connect("datubaze.db")
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM pieteikumi WHERE user_id = ? AND pulcins_id = ?", (user_id, pulcins_id))
+    atbilde = cur.fetchone()
+
+    cur.execute("SELECT vietas FROM pulcini WHERE id = ?", (pulcins_id,))
+    vietas = cur.fetchone()
+
+    if vietas and vietas[0] > 0 and not atbilde:
+
+        cur.execute("INSERT INTO pieteikumi (user_id, pulcins_id) VALUES (?, ?)", (user_id, pulcins_id))
+        cur.execute("UPDATE pulcini SET vietas = vietas - 1 WHERE id=?", (pulcins_id,))
+        conn.commit()
+
+    conn.close()
+
+    return redirect('/izvelne')
 
 @app.route("/pieteikumi")
 def pieteikumi():
+
+    
+    
     return render_template("pieteikumi.html")
 
 
