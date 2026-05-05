@@ -104,19 +104,54 @@ def pievienoties():
     if vietas and vietas[0] > 0 and not atbilde:
 
         cur.execute("INSERT INTO pieteikumi (user_id, pulcins_id) VALUES (?, ?)", (user_id, pulcins_id))
-        cur.execute("UPDATE pulcini SET vietas = vietas - 1 WHERE id=?", (pulcins_id,))
+        cur.execute("UPDATE pulcini SET vietas = vietas - 1 WHERE id = ?", (pulcins_id,))
         conn.commit()
 
     conn.close()
 
     return redirect('/izvelne')
 
+
 @app.route("/pieteikumi")
 def pieteikumi():
 
-    
-    
-    return render_template("pieteikumi.html")
+    user_id = session.get('id')
+    conn = sqlite3.connect("datubaze.db")
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT pulcini.id, pulcini.nosaukums
+    FROM pieteikumi
+    JOIN pulcini ON pieteikumi.pulcins_id = pulcini.id
+    WHERE pieteikumi.user_id = ?
+    """, (user_id,))
+
+    pieteikumi = cur.fetchall()
+    conn.close()
+
+    return render_template("pieteikumi.html", pieteikumi=pieteikumi)
+
+
+@app.route('/atteikties', methods=['POST'])
+def atteikties():
+
+    user_id = session.get('id')
+    pulcins_id = request.form.get('pulcins_id')
+
+    if not pulcins_id:
+        return redirect('/pieteikumi')
+
+    conn = sqlite3.connect("datubaze.db", timeout=10)
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM pieteikumi WHERE user_id = ? AND pulcins_id = ?", (user_id, pulcins_id))
+    cur.execute("UPDATE pulcini SET vietas = vietas + 1 WHERE id = ?", (pulcins_id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect('/pieteikumi')
 
 
 @app.route('/admin')

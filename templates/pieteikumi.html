@@ -3,11 +3,20 @@
 
 <h2>Tavi pieteikumi</h2>
 
-<p>Mani pulciņu pieteikumi</p>
-
+{% if pieteikumi %}
 <ul>
-    <li>1. pulciņš</li>
-    <li>2. pulciņš</li>
+{% for i in pieteikumi %}
+    <li>
+        {{i.nosaukums}}
+        <form method="POST" action="/atteikties" style="display:inline;">
+            <input type="hidden" name="pulcins_id" value="{{i.id}}">
+            <button class="btn btn-danger btn-sm">Atteikties</button>
+        </form>
+    </li>
+{% endfor %}
 </ul>
+{% else %}
+<p>Nav pieteikumu</p>
+{% endif %}
 
 {% endblock %}
