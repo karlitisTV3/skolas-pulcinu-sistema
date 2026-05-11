@@ -34,10 +34,16 @@ def login():
         if lietotajs and check_password_hash(lietotajs['parole'], parole):
             session['id'] = lietotajs['id']
             session['vards'] = lietotajs['vards']
-            return redirect('/izvelne')
+            session['loma'] = lietotajs['loma']
+    
+            if lietotajs['loma'] == 'admin':
+                return redirect('/admin')
 
-        else:
-            return "Nepareizi dati"
+            elif lietotajs['loma'] == 'student':
+                return redirect('/izvelne')
+
+            else:
+                return "Nepareizi dati"
 
     return render_template('login.html')
 
@@ -173,6 +179,31 @@ def admin():
     conn.close()
 
     return render_template('admin.html', pulcini=pulcini, pieteikumi=pieteikumi)
+
+
+@app.route('/admin_izveidot', methods=['GET', 'POST'])
+def admin_izveidot():
+
+    if request.method == 'POST':
+
+        nosaukums = request.form.get('nosaukums')
+        apraksts = request.form.get('apraksts')
+        vietas = request.form.get('vietas')
+
+        conn = sqlite3.connect("datubaze.db")
+        cur = conn.cursor()
+
+        cur.execute("""
+        INSERT INTO pulcini (nosaukums, apraksts, vietas)
+        VALUES (?, ?, ?)
+        """, (nosaukums, apraksts, vietas))
+
+        conn.commit()
+        conn.close()
+
+        return redirect('/admin')
+
+    return render_template('admin_izveidot.html')
 
 
 @app.route("/logout")

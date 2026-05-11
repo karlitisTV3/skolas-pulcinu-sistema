@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Izveidot pulciņu</h2>
+
+<form method="POST">
+
+    <label>Pulciņa nosaukums</label>
+    <input type="text" name="nosaukums" class="form-control">
+    <br>
+    <label>Apraksts</label>
+    <textarea name="apraksts" class="form-control"></textarea>
+    <br>
+    <label>Vietu skaits</label>
+    <input type="number" name="vietas" class="form-control">
+    <br>
+    <button class="btn btn-success">
+        Izveidot
+    </button>
+
+</form>
+
+{% endblock %}

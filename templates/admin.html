@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Skolotāja panelis</h2>
+
+<h3>Visi pulciņi</h3>
+
+{% for i in pulcini %}
+
+<div class="card p-3 mb-2">
+    <h4>{{i.nosaukums}}</h4>
+    <p>{{i.apraksts}}</p>
+    <p>Brīvās vietas: {{i.vietas}}</p>
+
+    <form method="POST" action="/admin_delete">
+        <input type="hidden" name="id" value="{{i.id}}">
+        <button class="btn btn-danger">Dzēst</button>
+    </form>
+</div>
+
+{% endfor %}
+
+<hr>
+<h3>Skolēnu pieteikumi</h3>
+
+<table class="table">
+    <tr>
+        <th>Vārds</th>
+        <th>Uzvārds</th>
+        <th>Klase</th>
+        <th>Pulciņš</th>
+    </tr>
+
+{% for i in pieteikumi %}
+
+    <tr>
+        <td>{{ i.vards }}</td>
+        <td>{{ i.uzvards }}</td>
+        <td>{{ i.klase }}</td>
+        <td>{{ i.nosaukums }}</td>
+    </tr>
+
+{% endfor %}
+
+</table>
+
+<a href="/admin_izveidot" class="btn btn-primary">
+    Pievienot jaunu pulciņu
+</a>
+
+{% endblock %}
