@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for , session
+from flask import Flask, render_template, request, redirect, url_for , session, flash
 import random
 import sqlite3
 from werkzeug.security import generate_password_hash , check_password_hash
@@ -43,7 +43,8 @@ def login():
                 return redirect('/izvelne')
 
             else:
-                return "Nepareizi dati"
+                flash('Nepareizi dati!')
+                return redirect('login')
 
     return render_template('login.html')
 
@@ -204,6 +205,21 @@ def admin_izveidot():
         return redirect('/admin')
 
     return render_template('admin_izveidot.html')
+
+
+@app.route('/admin_delete', methods=['POST'])
+def admin_delete():
+
+    pulcins_id = request.form.get('id')
+    conn = sqlite3.connect("datubaze.db")
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM pieteikumi WHERE pulcins_id = ?", (pulcins_id,))
+    cur.execute("DELETE FROM pulcini WHERE id = ?", (pulcins_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect('/admin')
 
 
 @app.route("/logout")
