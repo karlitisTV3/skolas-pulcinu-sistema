@@ -11,3 +11,6 @@ HTML / CSS
 
 ## Plānošana
 Wireframe un ERD shēma tika izstrādāta diagrams.net programmā.
+
+
+https://pulcinu0pieteiksanas0sistema.eu.pythonanywhere.com
