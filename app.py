@@ -7,17 +7,17 @@ from werkzeug.security import generate_password_hash , check_password_hash
 app = Flask(__name__)
 app.secret_key = "slepenais"
 
-
+# Savienojums ar datubāzi
 def get_db():
     return sqlite3.connect("datubaze.db")
 
 
-@app.route("/")
+@app.route("/") # Sākumlapa
 def home():
     return render_template("index.html")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST']) # Pieslēgšanās
 def login():
 
     if request.method == 'POST':
@@ -25,7 +25,7 @@ def login():
         parole = request.form.get('parole')
 
         if epasts == "" or parole == "":
-            flash("Ievadi visus laukus")
+            flash("Aizpildi visus laukus")
             return redirect('/login')
 
         conn = sqlite3.connect("datubaze.db")
@@ -53,7 +53,7 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST']) # Reģistrācija
 def register():
 
     if  request.method == 'POST':
@@ -69,7 +69,7 @@ def register():
             return redirect('/register')
 
         if "@edu.riga.lv" not in epasts:
-            flash("Ievadi skolas epastu")
+            flash("Ievadi skolas epastu - @edu.riga.lv")
             return redirect('/register')
 
         conn = sqlite3.connect("datubaze.db")
@@ -96,7 +96,7 @@ def register():
     return render_template('register.html')
 
 
-@app.route("/izvelne")
+@app.route("/izvelne") # Skolēna pulciņu saraksts
 def izvelne():
 
     if not session.get('id'):
@@ -117,7 +117,7 @@ def izvelne():
     return render_template("izvelne.html" , pulcini=pulcini , mani=mani)
 
 
-@app.route('/pievienoties', methods=['POST'])
+@app.route('/pievienoties', methods=['POST']) # Pieteikšanās pulciņam
 def pievienoties():
 
     user_id = session.get('id')
@@ -128,7 +128,7 @@ def pievienoties():
     cur.execute("SELECT * FROM pulcini WHERE id = ?", (pulcins_id,))
     pulcins = cur.fetchone()
 
-    if pulcins <= 0:
+    if pulcins[3] <= 0:
         conn.close()
         flash("Pulciņš ir pilns")
         return redirect('/izvelne')
@@ -155,7 +155,7 @@ def pievienoties():
     return redirect('/izvelne')
 
 
-@app.route("/pieteikumi")
+@app.route("/pieteikumi") # Skolēna pieteikumi
 def pieteikumi():
 
     user_id = session.get('id')
@@ -176,7 +176,7 @@ def pieteikumi():
     return render_template("pieteikumi.html", pieteikumi=pieteikumi)
 
 
-@app.route('/atteikties', methods=['POST'])
+@app.route('/atteikties', methods=['POST']) # Atteikties no pulciņa
 def atteikties():
 
     user_id = session.get('id')
@@ -197,7 +197,7 @@ def atteikties():
     return redirect('/pieteikumi')
 
 
-@app.route('/admin')
+@app.route('/admin') # Admin / Skolotāja panelis
 def admin():
 
     if session.get('loma') != 'admin':
@@ -221,7 +221,7 @@ def admin():
     return render_template('admin.html', pulcini=pulcini, pieteikumi=pieteikumi)
 
 
-@app.route('/admin_izveidot', methods=['GET', 'POST'])
+@app.route('/admin_izveidot', methods=['GET', 'POST']) # Izveidot pulciņu
 def admin_izveidot():
 
     if session.get('loma') != 'admin':
@@ -232,6 +232,14 @@ def admin_izveidot():
         nosaukums = request.form.get('nosaukums')
         apraksts = request.form.get('apraksts')
         vietas = request.form.get('vietas')
+
+        if nosaukums == "" or apraksts == "" or vietas == "":
+            flash("Visi lauki jāaizpilda")
+            return redirect('/admin_izveidot')
+
+        if int(vietas) <= 0:
+            flash("Vietu skaits nevar būt negatīvs vai 0")
+            return redirect('/admin_izveidot')
 
         conn = sqlite3.connect("datubaze.db")
         cur = conn.cursor()
@@ -249,7 +257,7 @@ def admin_izveidot():
     return render_template('admin_izveidot.html')
 
 
-@app.route('/admin_delete', methods=['POST'])
+@app.route('/admin_delete', methods=['POST']) # Dzēst pulciņu
 def admin_delete():
 
     if session.get('loma') != 'admin':
@@ -267,7 +275,7 @@ def admin_delete():
     return redirect('/admin')
 
 
-@app.route("/logout")
+@app.route("/logout") # Iziet no konta
 def logout():
     session.clear()
     return redirect("/")

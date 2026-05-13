@@ -6,8 +6,9 @@
 {% if pieteikumi %}
 <ul>
 {% for i in pieteikumi %}
-    <li>
-        {{i.nosaukums}}
+    <li class="card p-3 mb-3">
+        <h4>{{i.nosaukums}}</h4>
+        <p>{{i.apraksts}}</p>
         <form method="POST" action="/atteikties" style="display:inline;">
             <input type="hidden" name="pulcins_id" value="{{i.id}}">
             <button class="btn btn-danger btn-sm">Atteikties</button>
