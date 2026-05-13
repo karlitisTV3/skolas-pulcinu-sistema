@@ -24,6 +24,10 @@ def login():
         epasts = request.form.get('epasts')
         parole = request.form.get('parole')
 
+        if epasts == "" or parole == "":
+            flash("Ievadi visus laukus")
+            return redirect('/login')
+
         conn = sqlite3.connect("datubaze.db")
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
@@ -60,8 +64,24 @@ def register():
         parole = request.form.get('parole')
         parole_hash = generate_password_hash(parole)
 
+        if epasts == "" or vards == "" or uzvards == "" or klase == "" or parole == "":
+            flash("Visi lauki obligāti jāaizpilda")
+            return redirect('/register')
+
+        if "@edu.riga.lv" not in epasts:
+            flash("Ievadi skolas epastu")
+            return redirect('/register')
+
         conn = sqlite3.connect("datubaze.db")
         cur = conn.cursor()
+
+        cur.execute("SELECT * FROM users WHERE epasts = ?", (epasts,))
+        parbaude = cur.fetchone()
+
+        if parbaude:
+            conn.close()
+            flash("Tu jau esi reģistrējies ar šo epastu!")
+            return redirect('/register')
 
         cur.execute("""
         INSERT INTO users (epasts, vards, uzvards, klase, parole)
@@ -79,6 +99,9 @@ def register():
 @app.route("/izvelne")
 def izvelne():
 
+    if not session.get('id'):
+        return redirect('/login')
+    
     user_id = session.get('id')
     conn = sqlite3.connect("datubaze.db")
     conn.row_factory = sqlite3.Row
@@ -102,8 +125,21 @@ def pievienoties():
     conn = sqlite3.connect("datubaze.db")
     cur = conn.cursor()
 
+    cur.execute("SELECT * FROM pulcini WHERE id = ?", (pulcins_id,))
+    pulcins = cur.fetchone()
+
+    if pulcins <= 0:
+        conn.close()
+        flash("Pulciņš ir pilns")
+        return redirect('/izvelne')
+
     cur.execute("SELECT * FROM pieteikumi WHERE user_id = ? AND pulcins_id = ?", (user_id, pulcins_id))
     atbilde = cur.fetchone()
+
+    if atbilde:
+        conn.close()
+        flash("Tu jau esi pieteicies")
+        return redirect('/izvelne')
 
     cur.execute("SELECT vietas FROM pulcini WHERE id = ?", (pulcins_id,))
     vietas = cur.fetchone()
@@ -164,6 +200,9 @@ def atteikties():
 @app.route('/admin')
 def admin():
 
+    if session.get('loma') != 'admin':
+        return redirect('/')
+
     conn = sqlite3.connect("datubaze.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
@@ -184,6 +223,9 @@ def admin():
 
 @app.route('/admin_izveidot', methods=['GET', 'POST'])
 def admin_izveidot():
+
+    if session.get('loma') != 'admin':
+        return redirect('/')
 
     if request.method == 'POST':
 
@@ -209,6 +251,9 @@ def admin_izveidot():
 
 @app.route('/admin_delete', methods=['POST'])
 def admin_delete():
+
+    if session.get('loma') != 'admin':
+        return redirect('/')
 
     pulcins_id = request.form.get('id')
     conn = sqlite3.connect("datubaze.db")
